@@ -29,6 +29,8 @@ This skill is backed by summarized references derived from ERDA source analysis:
 - semantic notes: [`references/semantic-notes.md`](references/semantic-notes.md)
 - action capabilities: [`references/action-capabilities.md`](references/action-capabilities.md)
 - best practices: [`references/best-practices.md`](references/best-practices.md)
+- `dice.yml` review checklist: [`references/diceyml-review-checklist.md`](references/diceyml-review-checklist.md)
+- `pipeline.yml` review checklist: [`references/pipelineyml-review-checklist.md`](references/pipelineyml-review-checklist.md)
 
 ## Use This Skill For
 
@@ -38,6 +40,8 @@ This skill is backed by summarized references derived from ERDA source analysis:
 - explaining what a common pipeline action supports
 - mapping a project stack to a recommended action chain
 - reviewing a spec file against parser-supported structure
+- reviewing a `dice.yml` systematically
+- reviewing a `pipeline.yml` systematically
 - drafting a spec file with parser-compatible fields
 - answering "is this field supported?" questions
 
@@ -56,8 +60,9 @@ This skill is backed by summarized references derived from ERDA source analysis:
    - field may still require semantic validation elsewhere
 7. If the request mixes file structure with action capability, answer the structure part first, then map the relevant actions and outputs.
 8. Prefer concise field-level answers with exact YAML names.
-9. When a user asks for a recommended pipeline, prefer the demo-derived patterns in the best-practices reference.
-10. Do not expose development-machine paths or tell the user to inspect local source trees that are not part of the distributed skill.
+9. When the user asks for a review, use the relevant review checklist instead of giving loose commentary.
+10. When a user asks for a recommended pipeline, prefer the demo-derived patterns in the best-practices reference.
+11. Do not expose development-machine paths or tell the user to inspect local source trees that are not part of the distributed skill.
 
 ## References
 
@@ -67,3 +72,5 @@ This skill is backed by summarized references derived from ERDA source analysis:
 - Semantic notes: [`references/semantic-notes.md`](references/semantic-notes.md)
 - Action capabilities: [`references/action-capabilities.md`](references/action-capabilities.md)
 - Best practices: [`references/best-practices.md`](references/best-practices.md)
+- `dice.yml` review checklist: [`references/diceyml-review-checklist.md`](references/diceyml-review-checklist.md)
+- `pipeline.yml` review checklist: [`references/pipelineyml-review-checklist.md`](references/pipelineyml-review-checklist.md)
