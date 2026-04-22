@@ -8,6 +8,7 @@ Use this file when the user asks:
 - which actions should be chained together
 - what a Go, Java, Node.js, or Dockerfile-based pipeline usually looks like
 - how to connect build outputs to `release` and `dice`
+- where quality, test, or manual gates should be inserted
 
 ## Default Delivery Pattern
 
@@ -24,6 +25,16 @@ The hand-off normally looks like this:
 - `release` reads `dice.yml` from `${git-checkout}/dice.yml`
 - `release` maps a service name to `${build-action:OUTPUT:image}`
 - `dice` consumes `${release:OUTPUT:releaseID}`
+
+Optional gates that fit naturally before `release`:
+
+- `unit-test`
+- `sonar`
+- `manual-review`
+
+Optional verification that can fit after deployment or against a target environment:
+
+- `api-test`
 
 ## Go Application Pattern
 
@@ -98,6 +109,46 @@ The most important cross-file convention is:
 - should match the target service name in `dice.yml`
 
 If these names drift apart, the release can be structurally valid while still producing the wrong deployment artifact mapping.
+
+## Quality And Gate Pattern
+
+When a pipeline needs stronger delivery confidence, a practical pattern is:
+
+1. `git-checkout`
+2. one or more verification actions such as `unit-test` or `sonar`
+3. a build action
+4. optional `manual-review`
+5. `release`
+6. `dice`
+
+Practical rule:
+
+- keep code-quality and test actions before `release`, because they validate the source and build intent before artifact publication.
+
+## API Verification Pattern
+
+When a pipeline needs interface-level verification, a practical pattern is:
+
+1. prepare or deploy the target system
+2. run one or more `api-test` actions
+3. pass values between API steps with `out_params`
+
+Practical rule:
+
+- use `api-test` for orchestration and assertion, not as a replacement for build or packaging actions.
+
+## When To Consider `buildpack`
+
+Prefer `buildpack` when:
+
+- a repository is multi-module
+- the platform should own most of the build strategy
+- the team wants a unified builder instead of language-specific action selection
+
+Prefer language-specific build actions when:
+
+- the project already has a clear stack-specific pipeline
+- the team wants explicit control over build commands and packaging behavior
 
 ## When To Use `release`
 

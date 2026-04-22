@@ -26,6 +26,7 @@ This skill is backed by summarized references derived from ERDA source analysis:
 - source mapping: [`references/source-map.md`](references/source-map.md)
 - dice fields: [`references/diceyml-fields.md`](references/diceyml-fields.md)
 - pipeline fields: [`references/pipelineyml-fields.md`](references/pipelineyml-fields.md)
+- semantic notes: [`references/semantic-notes.md`](references/semantic-notes.md)
 - action capabilities: [`references/action-capabilities.md`](references/action-capabilities.md)
 - best practices: [`references/best-practices.md`](references/best-practices.md)
 
@@ -33,6 +34,7 @@ This skill is backed by summarized references derived from ERDA source analysis:
 
 - explaining what fields are supported in `dice.yml`
 - explaining what fields are supported in `pipeline.yml`
+- explaining what parser behavior or validation is implied by a field
 - explaining what a common pipeline action supports
 - mapping a project stack to a recommended action chain
 - reviewing a spec file against parser-supported structure
@@ -48,18 +50,20 @@ This skill is backed by summarized references derived from ERDA source analysis:
    - best-practice composition across multiple actions
 3. Ground structure answers in the parser-derived field index, not in guesswork or market descriptions.
 4. Ground action answers in the summarized action capability reference, not in generic CI/CD assumptions.
-5. When a user asks about support, distinguish clearly between:
+5. Use the semantic notes reference when a field exists but the real question is how merge, validation, upgrade, ref, or default dependency behavior works.
+6. When a user asks about support, distinguish clearly between:
    - field exists in the parser structure
    - field may still require semantic validation elsewhere
-6. If the request mixes file structure with action capability, answer the structure part first, then map the relevant actions and outputs.
-7. Prefer concise field-level answers with exact YAML names.
-8. When a user asks for a recommended pipeline, prefer the demo-derived patterns in the best-practices reference.
-9. Do not expose development-machine paths or tell the user to inspect local source trees that are not part of the distributed skill.
+7. If the request mixes file structure with action capability, answer the structure part first, then map the relevant actions and outputs.
+8. Prefer concise field-level answers with exact YAML names.
+9. When a user asks for a recommended pipeline, prefer the demo-derived patterns in the best-practices reference.
+10. Do not expose development-machine paths or tell the user to inspect local source trees that are not part of the distributed skill.
 
 ## References
 
 - Source map: [`references/source-map.md`](references/source-map.md)
 - `dice.yml` field index: [`references/diceyml-fields.md`](references/diceyml-fields.md)
 - `pipeline.yml` field index: [`references/pipelineyml-fields.md`](references/pipelineyml-fields.md)
+- Semantic notes: [`references/semantic-notes.md`](references/semantic-notes.md)
 - Action capabilities: [`references/action-capabilities.md`](references/action-capabilities.md)
 - Best practices: [`references/best-practices.md`](references/best-practices.md)

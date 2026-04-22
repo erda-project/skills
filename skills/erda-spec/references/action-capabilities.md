@@ -8,6 +8,7 @@ Use this file when the user asks:
 - what params an action supports
 - what outputs can be consumed by later actions
 - how actions chain together in `pipeline.yml`
+- what test, scan, or review actions exist beyond build and deploy
 
 ## Common Delivery Chain
 
@@ -230,6 +231,115 @@ Practical notes:
 - `release_id_path` exists for compatibility but is marked deprecated in action metadata.
 - `runtimeID` is the key bridge into runtime-oriented diagnosis after deployment.
 
+## `sonar`
+
+Purpose:
+
+- run code quality analysis and optionally enforce quality-gate status
+
+Common params:
+
+- `code_dir`
+- `must_gate_status_ok`
+- `sonar_host_url`
+- `sonar_login`
+- `sonar_password`
+- `sonar_project_key`
+
+Practical notes:
+
+- `code_dir` is the analysis root.
+- this action is a quality stage, not a packaging stage.
+- `must_gate_status_ok` controls whether gate result should block the pipeline.
+
+## `unit-test`
+
+Purpose:
+
+- run unit tests as a dedicated test-management action
+
+Common params:
+
+- `context`
+- `name`
+- `command`
+- `go_dir`
+
+Practical notes:
+
+- `context` usually points at the checked-out repository.
+- `go_dir` is particularly relevant for Go test layouts.
+- this action fits before packaging and release, not after deployment.
+
+## `manual-review`
+
+Purpose:
+
+- insert a human approval step into the pipeline
+
+Common params:
+
+- `processor`
+- `wain_time_interval_sec`
+
+Practical notes:
+
+- `processor` is a string array of reviewer identifiers.
+- use this action as a delivery gate rather than a build step.
+
+## `api-test`
+
+Purpose:
+
+- execute a single API test with request definition, extracted outputs, and assertions
+
+Common params:
+
+- `name`
+- `url`
+- `method`
+- `params`
+- `headers`
+- `body`
+- `out_params`
+- `asserts`
+
+Outputs:
+
+- outputs can be derived dynamically from `out_params`
+
+Practical notes:
+
+- `out_params` makes this action useful in multi-step API test orchestration.
+- `asserts` can fail the action even when the HTTP call itself succeeds.
+- this action is more suited to verification flows than build flows.
+
+## `buildpack`
+
+Purpose:
+
+- provide a unified builder abstraction for supported stacks and multi-module applications
+
+Common params:
+
+- `context`
+- `modules`
+- `bp_repo`
+- `bp_ver`
+- `bp_args`
+- `http_proxy`
+- `https_proxy`
+- `only_build`
+- `language`
+- `build_type`
+- `container_type`
+
+Practical notes:
+
+- this action is useful when the platform should auto-detect or centrally manage build behavior.
+- `modules` is structured and important for multi-module repositories.
+- `only_build` separates compilation from image creation.
+
 ## Output Hand-Off Rules
 
 When chaining actions, these outputs are the most important:
@@ -238,6 +348,7 @@ When chaining actions, these outputs are the most important:
 - `${build-action:OUTPUT:image}` for image hand-off into `release`
 - `${release:OUTPUT:releaseID}` for release hand-off into `dice`
 - `${dice:OUTPUT:runtimeID}` for post-deployment runtime investigation
+- `api-test` can expose later-consumable values through `out_params`
 
 ## Review Checklist
 
@@ -248,3 +359,4 @@ When reviewing a pipeline that uses these actions, check:
 - whether service-to-image mapping in `release` matches `dice.yml` service names
 - whether outputs are referenced with the correct expression syntax
 - whether `dice` action version and params match the intended deployment mode
+- whether quality, test, or approval actions are placed before release and deployment
