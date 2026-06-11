@@ -13,6 +13,7 @@ This skill also includes:
 
 - prerequisites and fallback rules: [`references/prerequisites.md`](references/prerequisites.md)
 - operational reference: [`references/operations.md`](references/operations.md)
+- erda-cli installer/updater: [`scripts/install-erda-cli.sh`](scripts/install-erda-cli.sh)
 - deterministic prerequisite check: [`scripts/doctor.sh`](scripts/doctor.sh)
 - validation prompts: see [`references/operations.md`](references/operations.md)
 
@@ -25,7 +26,7 @@ This skill also includes:
 
 ## Workflow
 
-1. Verify CLI availability with the skill-local doctor script or direct probing from [`references/prerequisites.md`](references/prerequisites.md).
+1. Verify CLI availability with the skill-local doctor script or direct probing from [`references/prerequisites.md`](references/prerequisites.md). The doctor script installs `erda-cli` from the alpha channel when missing and checks for updates when present.
 2. If the request comes right after a pipeline run, first recover `runtimeID` from pipeline output or from `runtime list` before giving runtime commands.
 3. Identify the org, project, application, environment, and runtime scope.
 4. Distinguish between deployment problems, application problems, and infrastructure symptoms.
