@@ -13,7 +13,8 @@ Skills are intentionally backed by more than a single markdown file:
 
 - `references/` captures command and workflow knowledge
 - `assets/templates/` provides reusable workflow starters where useful
-- `scripts/doctor.sh` performs deterministic `erda-cli` prerequisite checks
+- `scripts/install-erda-cli.sh` installs or updates `erda-cli` from the alpha channel
+- `scripts/doctor.sh` performs deterministic `erda-cli` prerequisite checks and runs the installer/updater
 
 ## Included Skills
 
@@ -51,11 +52,12 @@ The concrete validation prompts are bundled in:
 
 ## erda-cli Requirement
 
-Both skills depend on `erda-cli`.
+The operational skills depend on `erda-cli`. During package installation, `postinstall` runs the skill-local installer when available. If a user installs a skill by copying or path-based GitHub install, run the doctor script once; it installs `erda-cli` if missing and checks for updates if it is already installed.
 
 Quick checks:
 
 ```bash
+bash skills/erda-cicd/scripts/install-erda-cli.sh
 bash skills/erda-cicd/scripts/doctor.sh
 bash skills/erda-runtime/scripts/doctor.sh
 ```
@@ -68,9 +70,13 @@ skills/
     assets/
     references/
     scripts/
+      install-erda-cli.sh
+      doctor.sh
     SKILL.md
   erda-runtime/
     references/
     scripts/
+      install-erda-cli.sh
+      doctor.sh
     SKILL.md
 ```

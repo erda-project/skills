@@ -15,6 +15,7 @@ This skill is backed by command knowledge and working assets:
 - command guidance: [`references/cli-capabilities.md`](references/cli-capabilities.md)
 - diagnostic playbook: [`references/diagnostics.md`](references/diagnostics.md)
 - reusable templates: [`assets/templates/basic-pipeline.yml`](assets/templates/basic-pipeline.yml), [`assets/templates/build-release-deploy.yml`](assets/templates/build-release-deploy.yml)
+- erda-cli installer/updater: [`scripts/install-erda-cli.sh`](scripts/install-erda-cli.sh)
 - deterministic prerequisite check: [`scripts/doctor.sh`](scripts/doctor.sh)
 - validation prompts: see [`references/cli-capabilities.md`](references/cli-capabilities.md)
 
@@ -30,7 +31,7 @@ This skill is backed by command knowledge and working assets:
 
 ## Workflow
 
-1. Verify CLI availability with the skill-local doctor script or direct probing from [`references/prerequisites.md`](references/prerequisites.md).
+1. Verify CLI availability with the skill-local doctor script or direct probing from [`references/prerequisites.md`](references/prerequisites.md). The doctor script installs `erda-cli` from the alpha channel when missing and checks for updates when present.
 2. Identify the repository context, branch, workspace, org, project, and application.
 3. Before `pipeline run`, check `git status --short`.
 4. If the workspace is dirty, stop. Treat this as a hard prerequisite failure and require the user to commit the intended changes first.

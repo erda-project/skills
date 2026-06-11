@@ -13,6 +13,7 @@
     "registry": "https://repo.terminus.io/api/npm/skills/"
   },
   "scripts": {
+    "postinstall": "bash skills/erda-cicd/scripts/install-erda-cli.sh",
     "pack:dry-run": "npm pack --dry-run"
   },
   "keywords": [
