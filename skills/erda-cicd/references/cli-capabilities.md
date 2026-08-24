@@ -14,7 +14,7 @@ The CLI exposes a `pipeline` command group focused on execution and inspection:
 
 ## Operational Behaviors
 
-- `pipeline run` requires a clean git workspace and resolves branch/application context from the current repository
+- `pipeline run` requires a clean git workspace and resolves branch/application context from the current repository or linked worktree
 - `pipeline status` can infer the latest pipeline on the current branch when no pipeline ID is given
 - `pipeline history` filters by branch, sources, statuses, and yml names
 - `pipeline logs` supports `--task-id`, `--task`, `--all`, `--failed`, `--running`, `--watch`, `--tail`, `--stream`, `--json`, and `--raw`
@@ -34,11 +34,22 @@ erda-cli pipeline run pipeline.yml --watch
 
 Notes:
 
-- the current directory must be a git repository
+- the current directory must be a git repository or linked worktree
 - the workspace must be clean before `pipeline run`
 - if the workspace is dirty, stop and commit the intended changes before running new pipeline content
 - when branch is omitted, the current git branch is used
 - prefer `erda-cli -V pipeline run ...` when the user is debugging a failure, not just triggering a run
+
+Before creating a run, use the existing-run gate:
+
+```bash
+erda-cli pipeline history --branch <branch>
+```
+
+- If history contains the target pipeline, continue with that pipeline ID.
+- Run `pipeline run` only after confirming that no target pipeline exists.
+- If the same app and branch report a deployment lock or duplicate-run condition, reuse the existing pipeline instead of creating another one.
+- If watch loses authentication, re-authenticate and query the original pipeline ID.
 
 ### Check Current Pipeline State
 
@@ -128,11 +139,11 @@ Switch to `erda-runtime` when:
 When the user says "the pipeline failed" or "CI/CD is stuck", default to this order:
 
 1. confirm repo context, branch, org, project, and application
-2. verify read access and recent history with `pipeline history`
-3. verify workspace cleanliness with `git status --short`
-4. if the workspace is dirty and the user wants to run new content, stop and require a commit first
-5. if a run exists, inspect it with `pipeline status` or `pipeline logs`
-6. if the user is creating a new run, use `erda-cli -V pipeline run ...`
+2. verify workspace cleanliness with `git status --short`
+3. verify read access and recent history with `pipeline history --branch <branch>`
+4. if a target run exists, inspect it with `pipeline status` or `pipeline logs`
+5. if no target run exists and the workspace is clean, use `erda-cli -V pipeline run ...`
+6. if a deployment lock or watch authentication failure occurs, preserve the original pipeline ID
 7. separate context failure, permission failure, pipeline execution failure, and downstream runtime failure
 
 ## Validation Prompts
@@ -149,8 +160,9 @@ Use these prompts to verify the skill behaves correctly after installation:
 - Distinguish between creating a run, checking status, looking at historical runs, and reading task logs.
 - Do not treat `whoami` success as proof that pipeline creation permission exists.
 - Treat dirty-workspace handling as a hard gate for `pipeline run`, not a soft suggestion.
-- Only mention a temporary clean clone for troubleshooting or reproduction, not as the primary way to run uncommitted changes.
-- If the user asks whether the deployment was stable, inspect `pipeline logs --all` even when the final result is `Success`.
+- Linked worktrees are supported by the current CLI; a normal clone is an isolation option, not a prerequisite.
+- Treat branch history as the gate before creating a new pipeline run.
+- Preserve the original pipeline ID across deployment locks and watch re-authentication.
 - If a deployment failed, determine whether the failure happened in pipeline execution or later in runtime behavior.
 - If the user asks about static `pipeline.yml`, keep the answer tied to how it affects actual `erda-cli` execution paths.
 

@@ -32,13 +32,16 @@ This skill is backed by command knowledge and working assets:
 
 1. Verify CLI availability with the skill-local doctor script or direct probing from [`references/prerequisites.md`](references/prerequisites.md).
 2. Identify the repository context, branch, workspace, org, project, and application.
-3. Before `pipeline run`, check `git status --short`.
+3. Confirm that the current directory is a repository or linked worktree, then check `git status --short`.
 4. If the workspace is dirty, stop. Treat this as a hard prerequisite failure and require the user to commit the intended changes first.
-5. Only use a temporary clean clone as a secondary troubleshooting or reproduction technique, not as the default path for running new pipeline content.
-6. In a temporary clean clone, verify `git remote -v` and `.erda.d/config` or equivalent project context before running the pipeline.
-7. Use the minimal diagnostic sequence from [`references/diagnostics.md`](references/diagnostics.md): `whoami`, `pipeline history`, then `erda-cli -V pipeline run ...`.
-8. Separate context discovery failure, permission failure, and pipeline execution failure.
-9. When giving commands, prefer exact subcommands and flags over abstract descriptions.
+5. After a push, run `pipeline history --branch <branch>` before creating a run.
+6. If history contains the target pipeline, record its ID and continue with that pipeline's status or logs.
+7. Only when history confirms that no target pipeline exists, run `pipeline run`.
+8. If the same app and branch report a deployment lock or duplicate-run condition, return to history/status and reuse the existing pipeline instead of creating another run.
+9. If watch loses authentication, re-authenticate and query the original pipeline ID; do not create a replacement run.
+10. Use the minimal diagnostic sequence from [`references/diagnostics.md`](references/diagnostics.md) when a step fails.
+11. Separate context discovery failure, permission failure, and pipeline execution failure.
+12. When giving commands, prefer exact subcommands and flags over abstract descriptions.
 
 ## Review Priorities
 
@@ -47,9 +50,16 @@ This skill is backed by command knowledge and working assets:
 - missing repository context such as `.erda.d/config` or correct `origin`
 - confusion between run creation, status inspection, history inspection, and log inspection
 - attempts to run pipelines from uncommitted workspace content
+- duplicate runs created before checking branch history or after watch authentication loss
 - read permission versus run permission mismatches
 - delivery failures that are actually earlier build failures
 - commands that skip authentication or repository cleanliness requirements
+
+## Operational Guardrails
+
+- Linked worktrees are supported by the current CLI. Use a normal clone only when isolation or reproduction is the actual goal.
+- Before `pipeline run`, use the existing-run gate: history first, then reuse an existing pipeline, then run only when no target exists.
+- When a deployment lock or watch authentication failure occurs, preserve and continue using the original pipeline ID.
 
 ## References
 
