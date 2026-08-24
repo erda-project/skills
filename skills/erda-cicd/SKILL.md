@@ -43,6 +43,12 @@ This skill is backed by command knowledge and working assets:
 11. Separate context discovery failure, permission failure, and pipeline execution failure.
 12. When giving commands, prefer exact subcommands and flags over abstract descriptions.
 
+For a parameterized run, use only the CLI. `--param` is repeatable and must use
+`name=value`; names must be non-empty and unique, and values are strings. The
+CLI uses its authenticated context client for the follow-up run request and
+preserves the created pipeline ID if that request fails. Do not fall back to
+`curl`, manually constructed API calls, or UI clicks.
+
 ## Review Priorities
 
 - wrong branch or workspace assumptions
@@ -60,6 +66,7 @@ This skill is backed by command knowledge and working assets:
 - Linked worktrees are supported by the current CLI. Use a normal clone only when isolation or reproduction is the actual goal.
 - Before `pipeline run`, use the existing-run gate: history first, then reuse an existing pipeline, then run only when no target exists.
 - When a deployment lock or watch authentication failure occurs, preserve and continue using the original pipeline ID.
+- The exact existing-run gate proves branch, commit/source, and YAML identity only when those fields are present in history. Runtime parameter values may not be exposed there, so an existing-run match does not prove parameter identity.
 
 ## References
 

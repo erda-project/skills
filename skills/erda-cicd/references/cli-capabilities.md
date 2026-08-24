@@ -19,6 +19,7 @@ The CLI exposes a `pipeline` command group focused on execution and inspection:
 - `pipeline history` filters by branch, sources, statuses, and yml names
 - `pipeline logs` supports `--task-id`, `--task`, `--all`, `--failed`, `--running`, `--watch`, `--tail`, `--stream`, `--json`, and `--raw`
 - `pipeline run` diagnostics are significantly more useful with `-V`
+- `pipeline run` accepts repeatable runtime parameters with `--param name=value`; values are sent as strings
 
 ## Typical Command Playbooks
 
@@ -30,6 +31,8 @@ Use when the user wants to trigger a pipeline from the current repository:
 erda-cli pipeline run pipeline.yml
 erda-cli pipeline run .erda/pipelines/build.yml --branch feature/my-branch
 erda-cli pipeline run pipeline.yml --watch
+erda-cli pipeline run pipeline.yml --param verificationHoldAfterPass=60m
+erda-cli pipeline run pipeline.yml --param foo=bar --param baz=qux
 ```
 
 Notes:
@@ -39,6 +42,9 @@ Notes:
 - if the workspace is dirty, stop and commit the intended changes before running new pipeline content
 - when branch is omitted, the current git branch is used
 - prefer `erda-cli -V pipeline run ...` when the user is debugging a failure, not just triggering a run
+- `--param` uses the first `=` as the separator, so values may contain `=` and may be empty; missing `=`, an empty name, or duplicate names is rejected
+- Without `--param`, the existing single create request remains `autoRun=true`. With `--param`, the CLI creates with `autoRun=false`, then sends `POST /api/cicds/<pipelineID>/actions/run` with `{"pipelineRunParams":[{"name":"verificationHoldAfterPass","value":"60m"}]}` through the authenticated CLI client.
+- If the follow-up run fails, retain the reported pipeline ID and error details. Do not recommend `curl`, manual API calls, or UI operations.
 
 Before creating a run, use the existing-run gate:
 
@@ -50,6 +56,11 @@ erda-cli pipeline history --branch <branch>
 - Run `pipeline run` only after confirming that no target pipeline exists.
 - If the same app and branch report a deployment lock or duplicate-run condition, reuse the existing pipeline instead of creating another one.
 - If watch loses authentication, re-authenticate and query the original pipeline ID.
+
+The gate must match the target branch, commit/source identity, and YAML identity
+available from history. Parameter identity is a separate evidence boundary:
+history may not expose the requested values, so an existing-run match alone does
+not prove that `verificationHoldAfterPass=60m` was used.
 
 ### Check Current Pipeline State
 
