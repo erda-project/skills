@@ -10,8 +10,9 @@ Use this sequence by default when the user wants to run or troubleshoot a pipeli
 erda-cli whoami
 git status --short
 erda-cli pipeline history --branch <branch>
-erda-cli -V pipeline run <file> --branch <branch>
 ```
+
+Use `erda-cli -V pipeline run <file> --branch <branch>` only after history confirms that no target pipeline exists.
 
 If the user already has a pipeline ID:
 
@@ -44,14 +45,11 @@ git commit -m "..."
 erda-cli pipeline run ./pipeline.yml
 ```
 
-## Temporary Clean Clone Guidance
+## Repository And Worktree Context
 
-Prefer a normal clone over `git worktree` only for troubleshooting or reproduction.
+The current CLI supports linked worktrees. A worktree is valid for pipeline commands when its Git state is clean and its branch, remote, and project context are resolvable.
 
-Why:
-
-- `erda-cli` may reject a worktree with `Current directory is not a local git repository`
-- a plain clone behaves more like the repository layout the CLI expects
+Use a normal clone when isolation or reproduction is the goal, not as a workaround for CLI worktree support.
 
 After cloning, check:
 
@@ -161,8 +159,11 @@ The verbose request and response details are often the shortest path to the real
 4. if dirty, stop and require a commit before `pipeline run`
 5. verify read access with `pipeline history`
 6. if the branch is missing from history, check whether it has been pushed
-7. if troubleshooting requires a reproduction environment, choose a safe clean-clone strategy
-8. in a clean clone, verify `git remote -v`
-9. verify `.erda.d/config` or equivalent context
-10. run `erda-cli -V pipeline run ...`
-11. classify the failure as context, branch visibility, permission, or pipeline-execution failure
+7. if history contains the target pipeline, preserve its ID and inspect it
+8. if history confirms no target pipeline, run `erda-cli -V pipeline run ...`
+9. if a deployment lock or duplicate-run condition appears, return to history/status and reuse the existing pipeline
+10. if watch loses authentication, re-authenticate and query the original pipeline ID
+11. if troubleshooting requires a reproduction environment, choose a safe clean-clone strategy
+12. in a clean clone, verify `git remote -v`
+13. verify `.erda.d/config` or equivalent context
+14. classify the failure as context, branch visibility, permission, or pipeline-execution failure
